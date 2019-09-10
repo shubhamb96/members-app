@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:generic_app/activity/activitypage.dart';
-import 'package:firebase_database/firebase_database.dart';  
-
-final databaseReference = FirebaseDatabase.instance.reference();
-
-
+import 'package:firebase_database/firebase_database.dart';
+import 'package:generic_app/event/eventdata.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,7 +9,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<EventData> allEventData = [];
 
+  @override
+  void initState() {
+    super.initState();
+    DatabaseReference ref = FirebaseDatabase.instance.reference();
+    ref.child('Events').once().then((DataSnapshot snap) {
+      var keys = snap.value.keys;
+      var data = snap.value;
+      allEventData.clear();
+      for (var key in keys) {
+        EventData d = new EventData(
+          data[key]['activity1'],
+          data[key]['activity2'], 
+          data[key]['eventName'], 
+          data[key]['venue']);
+        allEventData.add(d);
+      }
+      setState(() {
+        print('Length : ${allEventData.length}');
+      });
+    });
+  }
 
   Route _eventRoute() {
     return PageRouteBuilder(
@@ -32,8 +51,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  var list = ["1", "2", "3", "4", "5"];
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -44,10 +61,19 @@ class _HomePageState extends State<HomePage> {
         body: new Container(
           padding: new EdgeInsets.all(10.0),
           child: new Center(
-            child: new ListView(
-              scrollDirection: Axis.vertical,
-              children: <Widget>[for (var item in list) _showActivity(item)],
-            ),
+            child: allEventData.length == 0
+                ? new Text(' No Data is Available')
+                : new ListView.builder(
+                    itemCount: allEventData.length,
+                    itemBuilder: (_, index) {
+                      return _showActivity(
+                        allEventData[index].activity1,
+                        allEventData[index].activity2,
+                        allEventData[index].eventName,
+                        allEventData[index].venue,
+                      );
+                    },
+                  ),
           ),
         ),
         backgroundColor: Color(0xFF455a64),
@@ -120,7 +146,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _showActivity(String item) {
+  Widget _showActivity(
+      String activity1, String activity2, String eventName, String venue) {
     return new GestureDetector(
       onTap: () {
         Navigator.of(context).pushReplacement(_eventRoute());
@@ -141,12 +168,20 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       new Text(
-                        "Event $item",
+                        'Activity1 : $activity1',
                         style: TextStyle(fontSize: 25),
                       ),
                       new Text(
-                        "1 volunteer(s) needed",
-                        style: TextStyle(fontSize: 20),
+                        'Activity2 : $activity2',
+                        style: TextStyle(fontSize: 25),
+                      ),
+                      new Text(
+                        'EventName : $eventName',
+                        style: TextStyle(fontSize: 25),
+                      ),
+                      new Text(
+                        'Venue : $venue',
+                        style: TextStyle(fontSize: 25),
                       ),
                     ],
                   )),
