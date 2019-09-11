@@ -3,19 +3,21 @@ import 'package:generic_app/activity/activitypage.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:generic_app/event/eventdata.dart';
 
+DatabaseReference ref = FirebaseDatabase.instance.reference();
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  List<EventData> allEventData = [];
 
+  List<EventData> allEventData = new List();
   @override
-  void initState() {
+  initState() {
     super.initState();
-    DatabaseReference ref = FirebaseDatabase.instance.reference();
-    ref.child('Events').once().then((DataSnapshot snap) {
+    ref.child("Events").once().then((DataSnapshot snap){
+      print('Length : ${snap.value.toString()}');
       var keys = snap.value.keys;
       var data = snap.value;
       allEventData.clear();
