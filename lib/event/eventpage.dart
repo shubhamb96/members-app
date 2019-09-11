@@ -1,37 +1,53 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:generic_app/activity/activitypage.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:generic_app/event/eventdata.dart';
-
-DatabaseReference ref = FirebaseDatabase.instance.reference();
 
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+final FirebaseDatabase ref = FirebaseDatabase.instance;
 
+class _HomePageState extends State<HomePage> {
   List<EventData> allEventData = new List();
+  StreamSubscription<Event> _onTodoAddedSubscription;
+  StreamSubscription<Event> _onTodoChangedSubscription;
+  Query _todoQuery;
+
   @override
-  initState() {
+  void initState() {
     super.initState();
-    ref.child("Events").once().then((DataSnapshot snap){
-      print('Length : ${snap.value.toString()}');
-      var keys = snap.value.keys;
-      var data = snap.value;
-      allEventData.clear();
-      for (var key in keys) {
-        EventData d = new EventData(
-          data[key]['activity1'],
-          data[key]['activity2'], 
-          data[key]['eventName'], 
-          data[key]['venue']);
-        allEventData.add(d);
-      }
-      setState(() {
-        print('Length : ${allEventData.length}');
-      });
+    _todoQuery = ref.reference().child("Events");
+    _onTodoAddedSubscription = _todoQuery.onChildAdded.listen(_onEntryAdded);
+    _onTodoChangedSubscription =
+        _todoQuery.onChildChanged.listen(_onEntryChanged);
+  }
+
+  @override
+  void dispose() {
+    _onTodoAddedSubscription.cancel();
+    _onTodoChangedSubscription.cancel();
+    super.dispose();
+  }
+
+  _onEntryChanged(Event event) {
+    var oldEntry = allEventData.singleWhere((entry) {
+      return entry.key == event.snapshot.key;
+    });
+
+    setState(() {
+      allEventData[allEventData.indexOf(oldEntry)] =
+          EventData.fromSnapshot(event.snapshot);
+    });
+  }
+
+  _onEntryAdded(Event event) {
+    setState(() {
+      allEventData.add(EventData.fromSnapshot(event.snapshot));
     });
   }
 
@@ -63,19 +79,17 @@ class _HomePageState extends State<HomePage> {
         body: new Container(
           padding: new EdgeInsets.all(10.0),
           child: new Center(
-            child: allEventData.length == 0
-                ? new Text(' No Data is Available')
-                : new ListView.builder(
-                    itemCount: allEventData.length,
-                    itemBuilder: (_, index) {
-                      return _showActivity(
-                        allEventData[index].activity1,
-                        allEventData[index].activity2,
-                        allEventData[index].eventName,
-                        allEventData[index].venue,
-                      );
-                    },
-                  ),
+            child: new ListView.builder(
+              itemCount: allEventData.length,
+              itemBuilder: (_, index) {
+                return _showActivity(
+                  allEventData[index].activity1,
+                  allEventData[index].activity2,
+                  allEventData[index].eventName,
+                  allEventData[index].venue,
+                );
+              },
+            ),
           ),
         ),
         backgroundColor: Color(0xFF455a64),

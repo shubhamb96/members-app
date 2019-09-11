@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'event/eventpage.dart';
 
+
 class Login extends StatefulWidget {
   _LoginState createState() => _LoginState();
 }
@@ -27,8 +28,8 @@ class _LoginState extends State<Login> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Image.asset(
-                      "assets/volunteer.png",
-                      fit: BoxFit.contain,
+                    "assets/volunteer.png",
+                    fit: BoxFit.contain,
                   ),
                   _showSizedBox(45.0),
                   _showEmailInput(),
