@@ -13,7 +13,7 @@ class HomePage extends StatefulWidget {
 final FirebaseDatabase ref = FirebaseDatabase.instance;
 
 class _HomePageState extends State<HomePage> {
-  List<EventData> allEventData = new List();
+  List<EventData> allEventData;
   StreamSubscription<Event> _onTodoAddedSubscription;
   StreamSubscription<Event> _onTodoChangedSubscription;
   Query _todoQuery;
@@ -21,10 +21,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    allEventData = new List();
     _todoQuery = ref.reference().child("Events");
     _onTodoAddedSubscription = _todoQuery.onChildAdded.listen(_onEntryAdded);
-    _onTodoChangedSubscription =
-        _todoQuery.onChildChanged.listen(_onEntryChanged);
+    _onTodoChangedSubscription = _todoQuery.onChildChanged.listen(_onEntryChanged);
   }
 
   @override
@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
       allEventData.add(EventData.fromSnapshot(event.snapshot));
     });
   }
-
+  
   Route _eventRoute() {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => EventPage(),
@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
           child: new Center(
             child: new ListView.builder(
               itemCount: allEventData.length,
-              itemBuilder: (_, index) {
+              itemBuilder: (BuildContext context, int index) {
                 return _showActivity(
                   allEventData[index].activity1,
                   allEventData[index].activity2,
@@ -183,16 +183,16 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
+                      // new Text(
+                      //   'Activity1 : $activity1',
+                      //   style: TextStyle(fontSize: 25),
+                      // ),
+                      // new Text(
+                      //   'Activity2 : $activity2',
+                      //   style: TextStyle(fontSize: 25),
+                      //),
                       new Text(
-                        'Activity1 : $activity1',
-                        style: TextStyle(fontSize: 25),
-                      ),
-                      new Text(
-                        'Activity2 : $activity2',
-                        style: TextStyle(fontSize: 25),
-                      ),
-                      new Text(
-                        'EventName : $eventName',
+                        '$eventName Event',
                         style: TextStyle(fontSize: 25),
                       ),
                       new Text(
