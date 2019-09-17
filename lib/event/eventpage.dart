@@ -179,20 +179,21 @@ class _HomePageState extends State<HomePage> {
           child: Row(
             children: <Widget>[
               Container(
-                  padding: new EdgeInsets.fromLTRB(10, 10, 10, 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      new Text(
-                        '$eventName Event',
-                        style: TextStyle(fontSize: 25),
-                      ),
-                      new Text(
-                        'Venue : $venue',
-                        style: TextStyle(fontSize: 25),
-                      ),
-                    ],
-                  )),
+                padding: new EdgeInsets.fromLTRB(10, 10, 10, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    new Text(
+                      '$eventName Event',
+                      style: TextStyle(fontSize: 25),
+                    ),
+                    new Text(
+                      'Venue : $venue',
+                      style: TextStyle(fontSize: 25),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

@@ -25,8 +25,11 @@ class _EventPageState extends State<EventPage> {
   void initState() {
     super.initState();
     allActivityData = new List();
-    _activityQuery =
-        ref.reference().child("Activities").orderByChild("Event").equalTo(eventID);
+    _activityQuery = ref
+        .reference()
+        .child("Activities")
+        .orderByChild("Event")
+        .equalTo(eventID);
     _onTodoAddedSubscription =
         _activityQuery.onChildAdded.listen(_onEntryAdded);
     _onTodoChangedSubscription =
@@ -131,20 +134,45 @@ class _EventPageState extends State<EventPage> {
             borderRadius: BorderRadius.circular(10.0),
           ),
           child: Row(
+            //mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
                   padding: new EdgeInsets.fromLTRB(10, 10, 10, 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    
                     children: <Widget>[
-                      new Text(
-                        "$activityName",
-                        style: TextStyle(fontSize: 25),
+                      Column(
+                        //mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(10, 0, 250, 0),
+                          ),
+                          new Text(
+                            "$activityName",
+                            style: TextStyle(fontSize: 25),
+                          ),
+                          // new Text(
+                          //   "1 volunteer(s) needed",
+                          //   style: TextStyle(fontSize: 20),
+                          // ),
+                        ],
                       ),
-                      new Text(
-                        "1 volunteer(s) needed",
-                        style: TextStyle(fontSize: 20),
-                      ),
+                      Column(
+                        //mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          new RaisedButton(
+                            padding: EdgeInsets.all(10.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100.0),
+                            ),
+                            onPressed: () {},
+                            child: const Text('Register',
+                                style: TextStyle(fontSize: 20)),
+                          )
+                        ],
+                      )
                     ],
                   )),
             ],
