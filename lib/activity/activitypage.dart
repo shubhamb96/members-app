@@ -1,11 +1,68 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 
-class EventPage extends StatelessWidget {
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
+import 'package:generic_app/activity/activitydata.dart';
+
+class EventPage extends StatefulWidget {
+  int eventID;
+  EventPage(this.eventID);
+  @override
+  _EventPageState createState() => _EventPageState(this.eventID);
+}
+
+final FirebaseDatabase ref = FirebaseDatabase.instance;
+
+class _EventPageState extends State<EventPage> {
+  int eventID;
+  _EventPageState(this.eventID);
+  List<ActivityData> allActivityData;
+  StreamSubscription<Event> _onTodoAddedSubscription;
+  StreamSubscription<Event> _onTodoChangedSubscription;
+  Query _activityQuery;
+
+  @override
+  void initState() {
+    super.initState();
+    allActivityData = new List();
+    _activityQuery =
+        ref.reference().child("Activities").orderByChild("Event").equalTo(eventID);
+    _onTodoAddedSubscription =
+        _activityQuery.onChildAdded.listen(_onEntryAdded);
+    _onTodoChangedSubscription =
+        _activityQuery.onChildChanged.listen(_onEntryChanged);
+  }
+
+  @override
+  void dispose() {
+    _onTodoAddedSubscription.cancel();
+    _onTodoChangedSubscription.cancel();
+    super.dispose();
+  }
+
+  _onEntryChanged(Event event) {
+    var oldEntry = allActivityData.singleWhere((entry) {
+      return entry.key == event.snapshot.key;
+    });
+
+    setState(() {
+      allActivityData[allActivityData.indexOf(oldEntry)] =
+          ActivityData.fromSnapshot(event.snapshot);
+    });
+  }
+
+  _onEntryAdded(Event event) {
+    setState(() {
+      allActivityData.add(ActivityData.fromSnapshot(event.snapshot));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF455a64),
-      appBar: AppBar(title: Text('Events'), backgroundColor: Color(0xFF455a64)),
+      appBar:
+          AppBar(title: Text('Activities'), backgroundColor: Color(0xFF455a64)),
       body: new Stack(
         children: <Widget>[
           new Column(
@@ -23,31 +80,36 @@ class EventPage extends StatelessWidget {
                       child: new Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          new Text(
-                            "Cricket activities",
-                            style: new TextStyle(
-                                fontSize: 30.0, fontWeight: FontWeight.bold, color: Colors.white),
-                          ),
-                        ],
+                        // children: <Widget>[
+                        //   new Text(
+                        //     "Cricket activities",
+                        //     style: new TextStyle(
+                        //         fontSize: 30.0, fontWeight: FontWeight.bold, color: Colors.white),
+                        //   ),
+                        //],
                       ),
                     ),
                   ],
                 ),
               ),
-              new Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: new Text(
-                  "Volunteer for a fun day of Cricket!",
-                  style: new TextStyle(fontSize: 20.0, color: Colors.white),
-                  textAlign: TextAlign.justify,
-                ),
-              ),    
-              _showActivity(),
-              _showActivity(),
-              _showActivity(),
-              _showActivity(),
-              _showActivity(),
+              // new Padding(
+              //   padding: const EdgeInsets.all(10.0),
+              //   child: new Text(
+              //     "Volunteer for a fun day of Cricket!",
+              //     style: new TextStyle(fontSize: 20.0, color: Colors.white),
+              //     textAlign: TextAlign.justify,
+              //   ),
+              // ),
+              new ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemCount: allActivityData.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return _showActivity(
+                    allActivityData[index].name,
+                  );
+                },
+              ),
             ],
           ),
         ],
@@ -55,7 +117,7 @@ class EventPage extends StatelessWidget {
     );
   }
 
-  Widget _showActivity() {
+  Widget _showActivity(String activityName) {
     return new GestureDetector(
       onTap: () {
         //Navigator.of(context).pushReplacement(_eventRoute());
@@ -76,7 +138,7 @@ class EventPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       new Text(
-                        "Activity 1",
+                        "$activityName",
                         style: TextStyle(fontSize: 25),
                       ),
                       new Text(

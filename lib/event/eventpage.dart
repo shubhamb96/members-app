@@ -24,7 +24,8 @@ class _HomePageState extends State<HomePage> {
     allEventData = new List();
     _todoQuery = ref.reference().child("Events");
     _onTodoAddedSubscription = _todoQuery.onChildAdded.listen(_onEntryAdded);
-    _onTodoChangedSubscription = _todoQuery.onChildChanged.listen(_onEntryChanged);
+    _onTodoChangedSubscription =
+        _todoQuery.onChildChanged.listen(_onEntryChanged);
   }
 
   @override
@@ -50,10 +51,11 @@ class _HomePageState extends State<HomePage> {
       allEventData.add(EventData.fromSnapshot(event.snapshot));
     });
   }
-  
-  Route _eventRoute() {
+
+  Route _eventRoute(int eventID) {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => EventPage(),
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          EventPage(eventID),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(1.0, 0.0);
         var end = Offset.zero;
@@ -83,8 +85,7 @@ class _HomePageState extends State<HomePage> {
               itemCount: allEventData.length,
               itemBuilder: (BuildContext context, int index) {
                 return _showActivity(
-                  allEventData[index].activity1,
-                  allEventData[index].activity2,
+                  allEventData[index].eventID,
                   allEventData[index].eventName,
                   allEventData[index].venue,
                 );
@@ -162,11 +163,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _showActivity(
-      String activity1, String activity2, String eventName, String venue) {
+  Widget _showActivity(int eventID, String eventName, String venue) {
     return new GestureDetector(
       onTap: () {
-        Navigator.of(context).pushReplacement(_eventRoute());
+        Navigator.of(context).pushReplacement(_eventRoute(eventID));
       },
       child: new Container(
         margin: const EdgeInsets.all(10),
@@ -183,14 +183,6 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      // new Text(
-                      //   'Activity1 : $activity1',
-                      //   style: TextStyle(fontSize: 25),
-                      // ),
-                      // new Text(
-                      //   'Activity2 : $activity2',
-                      //   style: TextStyle(fontSize: 25),
-                      //),
                       new Text(
                         '$eventName Event',
                         style: TextStyle(fontSize: 25),
