@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:generic_app/activity/activitypage.dart';
 import 'package:firebase_database/firebase_database.dart';
