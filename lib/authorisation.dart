@@ -23,6 +23,7 @@ abstract class BaseAuth {
   Future<void> signOut();
 
   Future<bool> isEmailVerified();
+  
 }
 
 class Auth implements BaseAuth {
