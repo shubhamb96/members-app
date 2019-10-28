@@ -1,8 +1,12 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:generic_app/activity/activitypage.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:generic_app/drawer/account.dart';
 import 'package:generic_app/event/eventdata.dart';
+
+import '../login.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -116,7 +120,7 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(fontSize: 20),
                 ),
                 onTap: () {
-                  //Navigator.pop(context);
+                  Navigator.of(context).push(_profileRoute());
                 },
               ),
               ListTile(
@@ -152,7 +156,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 onTap: () {
-                  //Navigator.pop(context);
+                  _signOut();
                 },
               ),
             ],
@@ -199,6 +203,15 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  void _signOut() {
+    FirebaseAuth.instance.signOut();
+    Future<FirebaseUser> Function() user = FirebaseAuth.instance.currentUser;
+    //print('$user');
+    runApp(new MaterialApp(
+      home: new Login(),
+    ));
+  }
 }
 
 class BottomNav extends StatelessWidget {
@@ -228,4 +241,21 @@ class BottomNav extends StatelessWidget {
   void onTabTapped(int index) {
     _currentIndex = index;
   }
+}
+
+Route _profileRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => ProfilePage(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.fastLinearToSlowEaseIn;
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      var offsetAnimation = animation.drive(tween);
+      return SlideTransition(
+        position: offsetAnimation,
+        child: child,
+      );
+    },
+  );
 }

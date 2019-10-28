@@ -139,7 +139,6 @@ class _EventPageState extends State<EventPage> {
               Container(
                   padding: new EdgeInsets.fromLTRB(10, 10, 10, 20),
                   child: Row(
-                    
                     children: <Widget>[
                       Column(
                         //mainAxisAlignment: MainAxisAlignment.start,
